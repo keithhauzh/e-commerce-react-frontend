@@ -51,10 +51,28 @@ export default function ProductGrid(props) {
   };
 
   // add item to local storage (HANDLER)
-  // cart variable to store items inside
-  const cart = [];
   const addToCartHandler = async (item) => {
-    cart.push(item);
+    const stringProducts = localStorage.getItem("cart");
+    let cart = JSON.parse(stringProducts);
+    if (!cart) {
+      // if cart is inoccupied, set cart to empty array
+      cart = [];
+    }
+
+    const duplicateProduct = cart.find((product) => {
+      return item._id === product._id;
+    });
+
+    if (duplicateProduct) {
+      duplicateProduct.quantity += 1;
+    } else {
+      cart.push({
+        _id: item._id,
+        name: item.name,
+        price: item.price,
+        quantity: 1,
+      });
+    }
     localStorage.setItem("cart", JSON.stringify(cart));
     toast.success("Product added to cart successfully!");
   };
@@ -127,7 +145,11 @@ export default function ProductGrid(props) {
                 <Stack
                   direction="row"
                   spacing={1}
-                  sx={{ justifyContent: "space-between", width: "100%", mx: 1 }}
+                  sx={{
+                    justifyContent: "space-between",
+                    width: "100%",
+                    mx: 1,
+                  }}
                 >
                   <Button
                     variant="outlined"

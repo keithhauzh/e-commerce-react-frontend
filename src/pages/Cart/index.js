@@ -22,6 +22,11 @@ export default function Cart() {
   if (!cart) {
     cart = [];
   }
+  // start from 0
+  let totalPrices = 0;
+  for (const product of Cart) {
+    totalPrices += product.price;
+  }
   return (
     <>
       <Container>
@@ -49,12 +54,24 @@ export default function Cart() {
                   <TableCell component="th" scope="row">
                     {row.name}
                   </TableCell>
-                  <TableCell align="right">{row.calories}</TableCell>
-                  <TableCell align="right">{row.fat}</TableCell>
-                  <TableCell align="right">{row.carbs}</TableCell>
+                  <TableCell align="right">{row.price}</TableCell>
+                  <TableCell align="right">{row.quantity}</TableCell>
+                  <TableCell align="right">
+                    {row.price * row.quantity}
+                  </TableCell>
                   <TableCell align="right"></TableCell>
                 </TableRow>
               ))}
+              {/* row where total price is displayed */}
+              <TableRow
+                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+              >
+                <TableCell component="th" scope="row"></TableCell>
+                <TableCell align="right"></TableCell>
+                <TableCell align="right"></TableCell>
+                <TableCell align="right"></TableCell>
+                <TableCell align="right"></TableCell>
+              </TableRow>
             </TableBody>
           </Table>
         </TableContainer>
