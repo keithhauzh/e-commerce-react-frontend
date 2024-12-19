@@ -31,7 +31,7 @@ export default function ProductGrid(props) {
 
   const cardHeight = 250;
 
-  // delete item handler
+  // delete item handler (HANDLER)
   const handleDelete = async (id) => {
     console.log(id);
     const confirmed = window.confirm(
@@ -48,6 +48,15 @@ export default function ProductGrid(props) {
         toast.error("Failed to delete product");
       }
     }
+  };
+
+  // add item to local storage (HANDLER)
+  // cart variable to store items inside
+  const cart = [];
+  const addToCartHandler = async (item) => {
+    cart.push(item);
+    localStorage.setItem("cart", JSON.stringify(cart));
+    toast.success("Product added to cart successfully!");
   };
 
   return (
@@ -107,7 +116,11 @@ export default function ProductGrid(props) {
                     fontWeight: "bold",
                   }}
                 >
-                  <Button sx={{ width: "100%" }} variant="contained">
+                  <Button
+                    sx={{ width: "100%" }}
+                    variant="contained"
+                    onClick={() => addToCartHandler(item)}
+                  >
                     Add to Cart
                   </Button>
                 </Box>

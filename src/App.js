@@ -8,6 +8,7 @@ import { Toaster } from "sonner";
 import Product from "./pages/Products";
 import ProductAddNew from "./pages/ProductAddNew";
 import ProductEdit from "./pages/ProductEdit";
+import Cart from "./pages/Cart";
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
           <Route path="/" element={<Product />}></Route>
           <Route path="/products/new" element={<ProductAddNew />}></Route>
           <Route path="/products/:id/edit" element={<ProductEdit />}></Route>
+          <Route path="/cart" element={<Cart />}></Route>
         </Routes>
       </BrowserRouter>
       <Toaster richColors position="top-right" />
