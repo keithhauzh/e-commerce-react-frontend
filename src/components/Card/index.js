@@ -173,7 +173,7 @@ export default function ProductGrid(props) {
                     Delete
                   </Button>
                 </Stack>
-              </CardActions>
+              </CardActions>  
             </Card>
           </Grid>
         ))

@@ -1,113 +1,96 @@
-import * as React from "react";
-
-// MUI imports
+import { Container, Box, Button, Typography } from "@mui/material";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
+import Header from "../../components/Header";
 import {
-  Container,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Button,
-} from "@mui/material";
-
-// react-router-dom
-import { useState } from "react";
-
-// toaster imports
+  getCart,
+  deleteItemFromCart,
+  getTotalCartPrices,
+} from "../../utils/api_cart";
+import { useNavigate, Link } from "react-router-dom";
 import { toast } from "sonner";
 
-// component imports
-import Header from "../../components/Header";
-
-export default function Cart() {
-  // states for cart
-  const [list, setList] = useState([]);
-
-  // getting data from local storage
-  const stringProducts = localStorage.getItem("cart");
-  let cart = JSON.parse(stringProducts);
-  if (!cart) {
-    cart = [];
-  }
-
-  // delete from localStorage item by id
-  const cartDeleteHandler = async (id) => {
-    const newCart = cart.filter((item) => {
-      return id !== item._id;
-    });
-    localStorage.setItem("cart", JSON.stringify(newCart));
-    setList(newCart);
-    toast.success("Product deleted from cart successfully");
-  };
-
-  // to find total prices
-  // start from 0
-  let totalPrices = 0;
-  for (const product of cart) {
-    totalPrices += product.price * product.quantity;
-  }
-
+function Cart() {
+  const navigate = useNavigate();
+  const cart = getCart();
   return (
-    <>
-      <Container>
-        {/* Header section */}
-        <Header />
-
-        {/* Table */}
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
-            <TableHead>
-              <TableRow>
-                <TableCell>Product</TableCell>
-                <TableCell align="right">Price</TableCell>
-                <TableCell align="right">Quantity</TableCell>
-                <TableCell align="right">Total</TableCell>
-                <TableCell align="right">Action</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {cart.map((row) => (
-                <TableRow
-                  key={row.name}
-                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                >
+    <Container>
+      <Header title="Cart" />
+      <TableContainer component={Paper}>
+        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+          <TableHead>
+            <TableRow>
+              <TableCell>Product</TableCell>
+              <TableCell align="right">Price</TableCell>
+              <TableCell align="right">Quantity</TableCell>
+              <TableCell align="right">Total</TableCell>
+              <TableCell align="right">Action</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {cart.length > 0 ? (
+              cart.map((item) => (
+                <TableRow key={item._id}>
                   <TableCell component="th" scope="row">
-                    {row.name}
+                    {item.name}
                   </TableCell>
-                  <TableCell align="right">{row.price}</TableCell>
-                  <TableCell align="right">{row.quantity}</TableCell>
+                  <TableCell align="right">${item.price}</TableCell>
+                  <TableCell align="right">{item.quantity}</TableCell>
                   <TableCell align="right">
-                    {row.price * row.quantity}
-                  </TableCell>
+                    ${(item.price * item.quantity).toFixed(2)}
+                  </TableCell>{" "}
                   <TableCell align="right">
                     <Button
+                      variant="contained"
                       color="error"
+                      size="small"
+                      sx={{ textTransform: "none" }}
                       onClick={() => {
-                        cartDeleteHandler(row._id);
+                        deleteItemFromCart(item._id);
+                        toast.success(
+                          `${item.name} has been removed from the cart`
+                        );
+                        navigate("/cart");
                       }}
                     >
-                      remove
+                      Remove
                     </Button>
                   </TableCell>
                 </TableRow>
-              ))}
-              {/* row where total price is displayed */}
-              <TableRow
-                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-              >
-                <TableCell component="th" scope="row"></TableCell>
-                <TableCell align="right"></TableCell>
-                <TableCell align="right"></TableCell>
-                <TableCell align="right">{totalPrices}</TableCell>
-                <TableCell align="right"></TableCell>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={5} align="center">
+                  No Products Added Yet!
+                </TableCell>
               </TableRow>
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Container>
-    </>
+            )}
+          </TableBody>
+        </Table>
+        <Box sx={{ display: "flex", justifyContent: "flex-end", p: 2 }}>
+          <Typography variant="h6" sx={{ mr: 2 }}>
+            ${getTotalCartPrices()}
+          </Typography>
+          <Button
+            variant="contained"
+            color="primary"
+            size="large"
+            component={Link}
+            to="/checkout"
+            sx={{ textTransform: "none" }}
+            disabled={cart.length === 0 ? true : false}
+          >
+            Checkout
+          </Button>
+        </Box>
+      </TableContainer>
+    </Container>
   );
 }
+
+export default Cart;

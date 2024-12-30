@@ -37,7 +37,7 @@ export default function Product() {
     <Box>
       <Container>
         {/* Header Component */}
-        <Header />
+        <Header title="Welcome to my Store" />
 
         {/* Main */}
         <Box

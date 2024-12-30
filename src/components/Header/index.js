@@ -1,12 +1,10 @@
 import { Typography, Box, Button } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
 
-export default function Header() {
-  // using useLocation and calling its function in a variable
-  const location = useLocation();
-  const isActive = (path) => location.pathname === path;
-
+export default function Header(props) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { title = "Welcome To My Store" } = props;
   return (
     <Box
       sx={{
@@ -24,11 +22,11 @@ export default function Header() {
         }}
         mt={3}
       >
-        {isActive("/") ? "Welcome to my Store" : "Cart"}
+        {title}
       </Typography>
       <Box sx={{ display: "flex", justifyContent: "center" }} mt={2}>
         <Button
-          variant={isActive("/") ? "contained" : "outlined"}
+          variant={location.pathname === "/" ? "contained" : "outlined"}
           onClick={() => {
             navigate("/");
           }}
@@ -37,12 +35,21 @@ export default function Header() {
           Home
         </Button>
         <Button
-          variant={isActive("/cart") ? "contained" : "outlined"}
+          variant={location.pathname === "/cart" ? "contained" : "outlined"}
           onClick={() => {
             navigate("/cart");
           }}
+          sx={{ marginRight: "10px" }}
         >
           Cart
+        </Button>
+        <Button
+          variant={location.pathname === "/orders" ? "contained" : "outlined"}
+          onClick={() => {
+            navigate("/orders");
+          }}
+        >
+          My Orders
         </Button>
       </Box>
     </Box>
