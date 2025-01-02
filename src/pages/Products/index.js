@@ -7,14 +7,20 @@ import { Link } from "react-router-dom";
 import ProductGrid from "../../components/Card";
 import Header from "../../components/Header";
 
+// cookies import
+import { useCookies } from "react-cookie";
+
+// mui imports
 import { Typography, Button, Container, Box } from "@mui/material";
 import { InputLabel, MenuItem, FormControl, Select } from "@mui/material";
 import { ArrowRight, ArrowLeft } from "@mui/icons-material";
 
+// api imports
 import { getProducts } from "../../utils/api_products";
 import { getCategories } from "../../utils/api_categories";
 
 export default function Product() {
+
   // states
   const [page, setPage] = useState(1);
   const [products, setProducts] = useState([]);

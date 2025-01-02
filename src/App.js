@@ -1,6 +1,9 @@
 // import react-router-ddom
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+// cookie library import
+import { CookiesProvider } from "react-cookie";
+
 // toaster sonner
 import { Toaster } from "sonner";
 
@@ -18,21 +21,23 @@ import Signup from "./pages/Signup";
 export default function App() {
   return (
     <div className="App">
-      {/* setup the react routers */}
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Product />}></Route>
-          <Route path="/products/new" element={<ProductAddNew />}></Route>
-          <Route path="/products/:id/edit" element={<ProductEdit />}></Route>
-          <Route path="/cart" element={<Cart />}></Route>
-          <Route path="/checkout" element={<Checkout />}></Route>
-          <Route path="/verify-payment" element={<PaymentVerify />}></Route>
-          <Route path="/orders" element={<Orders />}></Route>
-          <Route path="/login" element={<Login />}></Route>
-          <Route path="/signup" element={<Signup />}></Route>
-        </Routes>
-      </BrowserRouter>
-      <Toaster richColors position="top-right" />
+      <CookiesProvider defaultSetOptions={{ path: "/" }}>
+        {/* setup the react routers */}
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Product />}></Route>
+            <Route path="/products/new" element={<ProductAddNew />}></Route>
+            <Route path="/products/:id/edit" element={<ProductEdit />}></Route>
+            <Route path="/cart" element={<Cart />}></Route>
+            <Route path="/checkout" element={<Checkout />}></Route>
+            <Route path="/verify-payment" element={<PaymentVerify />}></Route>
+            <Route path="/orders" element={<Orders />}></Route>
+            <Route path="/login" element={<Login />}></Route>
+            <Route path="/signup" element={<Signup />}></Route>
+          </Routes>
+        </BrowserRouter>
+        <Toaster richColors position="top-right" />
+      </CookiesProvider>
     </div>
   );
 }

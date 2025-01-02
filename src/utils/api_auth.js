@@ -32,3 +32,17 @@ export const doSignup = async (name, email, password) => {
     toast.error(error.response.data.error);
   }
 };
+
+// function to check if cookies is empty
+export const getCurrentUser = (cookie) => {
+  return cookie.currentUser ? cookie.currentUser : null;
+};
+
+export const isUserLoggedin = (cookie) => {
+  return getCurrentUser(cookie) ? true : false;
+};
+
+export const isAdmin = (cookie) => {
+  const currentUser = getCurrentUser(cookie);
+  return currentUser && currentUser.role === "admin" ? true : false;
+};

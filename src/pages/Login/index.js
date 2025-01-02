@@ -12,6 +12,9 @@ import Grid from "@mui/material/Grid2";
 // react imports
 import React, { useState } from "react";
 
+// react-router-dom imports
+import { useNavigate } from "react-router-dom";
+
 // component improts
 import Header from "../../components/Header";
 
@@ -21,7 +24,16 @@ import { toast } from "sonner";
 // api imports
 import { doLogin } from "../../utils/api_auth";
 
+// import useCookies
+import { useCookies } from "react-cookie";
+
 export default function Login() {
+  // useNavigate
+  const navigate = useNavigate();
+
+  // useCookies for cookies
+  const [cookie, setCookie] = useCookies(["currentUser"]);
+
   // states for input fields
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -33,15 +45,18 @@ export default function Login() {
     if (!email || !password) {
       toast.error("Please fill out all the required fields");
     }
-    const loginSuccessful = await doLogin(email, password);
-    if (loginSuccessful) {
-      toast.success("login test is successful");
+    const userData = await doLogin(email, password);
+    if (userData) {
+      toast.success("You have successfully logged in. Happy Shopping!");
+      setCookie("currentUser", userData, { maxAge: 60 * 60 * 24 * 30 }); // seconds, minutes, hours, days
+      // redirect user to home
+      navigate("/");
     }
   };
 
   return (
     <>
-      <Header />
+      <Header title="Login" />
       <Container component="main" maxWidth="xs">
         <CssBaseline />
         <Box

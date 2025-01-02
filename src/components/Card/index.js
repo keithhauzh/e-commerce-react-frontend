@@ -1,7 +1,11 @@
+// react import
 import React from "react";
 
 // react-router imports
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+
+// cookies import
+import { useCookies } from "react-cookie";
 
 // MUI imports
 import {
@@ -22,8 +26,17 @@ import { toast } from "sonner";
 
 // API imports
 import { deleteProduct, getProducts } from "../../utils/api_products";
+import { isAdmin } from "../../utils/api_auth";
+import { isUserLoggedin } from "../../utils/api_auth";
+import { ThermostatSharp } from "@mui/icons-material";
 
 export default function ProductGrid(props) {
+  // useNavigate
+  const navigate = useNavigate();
+
+  // cookies
+  const [cookie] = useCookies(["currentUser"]);
+
   const { products, setProducts, category, page } = props;
 
   // Color for chip
@@ -52,31 +65,36 @@ export default function ProductGrid(props) {
 
   // add item to local storage (HANDLER)
   const addToCartHandler = async (item) => {
-    const stringProducts = localStorage.getItem("cart");
-    let cart = JSON.parse(stringProducts);
-    if (!cart) {
-      // if cart is inoccupied, set cart to empty array
-      cart = [];
-    }
+    if (isUserLoggedin(cookie)) {
+      const stringProducts = localStorage.getItem("cart");
+      let cart = JSON.parse(stringProducts);
+      if (!cart) {
+        // if cart is inoccupied, set cart to empty array
+        cart = [];
+      }
 
-    const duplicateProduct = cart.find((product) => {
-      return item._id === product._id;
-    });
-
-    if (duplicateProduct) {
-      duplicateProduct.quantity += 1;
-    } else {
-      cart.push({
-        _id: item._id,
-        name: item.name,
-        price: item.price,
-        description: item.description,
-        category: item.category,
-        quantity: 1,
+      const duplicateProduct = cart.find((product) => {
+        return item._id === product._id;
       });
+
+      if (duplicateProduct) {
+        duplicateProduct.quantity += 1;
+      } else {
+        cart.push({
+          _id: item._id,
+          name: item.name,
+          price: item.price,
+          description: item.description,
+          category: item.category,
+          quantity: 1,
+        });
+      }
+      localStorage.setItem("cart", JSON.stringify(cart));
+      toast.success("Product added to cart successfully!");
+    } else {
+      navigate("/login");
+      toast.info("Please login first");
     }
-    localStorage.setItem("cart", JSON.stringify(cart));
-    toast.success("Product added to cart successfully!");
   };
 
   return (
@@ -153,27 +171,31 @@ export default function ProductGrid(props) {
                     mx: 1,
                   }}
                 >
-                  <Button
-                    variant="outlined"
-                    color="primary"
-                    size="small"
-                    sx={{ textTransform: "none", marginRight: "8px" }}
-                    LinkComponent={Link}
-                    to={`/products/` + item._id + `/edit`}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    color="error"
-                    size="small"
-                    sx={{ textTransform: "none" }}
-                    onClick={() => handleDelete(item._id)}
-                  >
-                    Delete
-                  </Button>
+                  {isAdmin(cookie) ? (
+                    <>
+                      <Button
+                        variant="outlined"
+                        color="primary"
+                        size="small"
+                        sx={{ textTransform: "none", marginRight: "8px" }}
+                        LinkComponent={Link}
+                        to={`/products/` + item._id + `/edit`}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        color="error"
+                        size="small"
+                        sx={{ textTransform: "none" }}
+                        onClick={() => handleDelete(item._id)}
+                      >
+                        Delete
+                      </Button>
+                    </>
+                  ) : null}
                 </Stack>
-              </CardActions>  
+              </CardActions>
             </Card>
           </Grid>
         ))

@@ -9,6 +9,9 @@ import {
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 
+// react-router-dom imports
+import { useNavigate } from "react-router-dom";
+
 // react imports
 import React, { useState } from "react";
 
@@ -21,7 +24,16 @@ import { doSignup } from "../../utils/api_auth";
 // component improts
 import Header from "../../components/Header";
 
+// import useCookies
+import { useCookies } from "react-cookie";
+
 export default function Signup() {
+  // useNavigate
+  const navigate = useNavigate();
+
+  // useCookies for cookies
+  const [cookie, setCookie] = useCookies(["currentUser"]);
+
   //  states for input fields
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -39,16 +51,19 @@ export default function Signup() {
     if (password !== confirmPassword) {
       toast.error("Please make sure both password fields are the same");
     } else {
-      const signupSuccessful = await doSignup(name, email, password);
-      if (signupSuccessful) {
-        toast.success("signup test is successful");
+      const userData = await doSignup(name, email, password);
+      if (userData) {
+        toast.success("You have successfully logged in. Happy Shopping!");
+        setCookie("currentUser", userData, { maxAge: 60 * 60 * 24 * 30 }); // seconds, minutes, hours, days
+        // redirect user to home
+        navigate("/");
       }
     }
   };
 
   return (
     <>
-      <Header />
+      <Header title="Signup" />
       <Container component="main" maxWidth="xs">
         <CssBaseline />{" "}
         <Box
