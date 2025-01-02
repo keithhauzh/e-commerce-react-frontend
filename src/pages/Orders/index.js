@@ -120,7 +120,7 @@ export default function Orders() {
                       sx={{ flexDirection: "column" }}
                     >
                       {order.products.map((product) => (
-                        <Grid>{product.name}</Grid>
+                        <Grid key={product._id}>{product.name}</Grid>
                       ))}
                     </Grid>
                   </TableCell>

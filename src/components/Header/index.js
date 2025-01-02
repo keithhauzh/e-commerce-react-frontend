@@ -48,8 +48,26 @@ export default function Header(props) {
           onClick={() => {
             navigate("/orders");
           }}
+          sx={{ marginRight: "10px" }}
         >
           My Orders
+        </Button>
+        <Button
+          variant={location.pathname === "/login" ? "contained" : "outlined"}
+          onClick={() => {
+            navigate("/login");
+          }}
+          sx={{ marginRight: "10px" }}
+        >
+          Login
+        </Button>
+        <Button
+          variant={location.pathname === "/signup" ? "contained" : "outlined"}
+          onClick={() => {
+            navigate("/signup");
+          }}
+        >
+          Signup
         </Button>
       </Box>
     </Box>
