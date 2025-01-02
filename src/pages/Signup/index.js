@@ -26,16 +26,23 @@ export default function Signup() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const handleFormSubmit = async (event) => {
     event.preventDefault();
     // check for error
-    if (!name || !email || !password) {
+    if (!name || !email || !password || !confirmPassword) {
       toast.error("Please fill out all the required fields");
     }
-    const signupSuccessful = await doSignup(name, email, password);
-    if (signupSuccessful) {
-      toast.success("signup test is successful");
+
+    // check if both password fields are the same
+    if (password !== confirmPassword) {
+      toast.error("Please make sure both password fields are the same");
+    } else {
+      const signupSuccessful = await doSignup(name, email, password);
+      if (signupSuccessful) {
+        toast.success("signup test is successful");
+      }
     }
   };
 
@@ -90,6 +97,18 @@ export default function Signup() {
                     setPassword(event.target.value);
                   }}
                   label="Password"
+                  type="password"
+                />
+              </Grid>
+              <Grid item xs={12} sx={{ display: "flex", width: "100%" }}>
+                <TextField
+                  required
+                  fullWidth
+                  value={confirmPassword}
+                  onChange={(event) => {
+                    setConfirmPassword(event.target.value);
+                  }}
+                  label="Confirm Password"
                   type="password"
                 />
               </Grid>
