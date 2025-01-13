@@ -17,6 +17,7 @@ import {
   Typography,
   Stack,
   Chip,
+  CardMedia,
 } from "@mui/material";
 import { red } from "@mui/material/colors";
 import Grid from "@mui/material/Grid2";
@@ -26,9 +27,12 @@ import { toast } from "sonner";
 
 // API imports
 import { deleteProduct, getProducts } from "../../utils/api_products";
-import { isAdmin } from "../../utils/api_auth";
-import { isUserLoggedin } from "../../utils/api_auth";
-import { ThermostatSharp } from "@mui/icons-material";
+import { isAdmin, isUserLoggedin, getUserToken } from "../../utils/api_auth";
+import {} from "../../utils/api_auth";
+import { uploadImage } from "../../utils/api_image";
+
+// constants import
+import { API_URL } from "../../constants";
 
 export default function ProductGrid(props) {
   // useNavigate
@@ -36,6 +40,7 @@ export default function ProductGrid(props) {
 
   // cookies
   const [cookie] = useCookies(["currentUser"]);
+  const token = getUserToken(cookie);
 
   const { products, setProducts, category, page } = props;
 
@@ -51,7 +56,7 @@ export default function ProductGrid(props) {
       "Are you sure you want to delete this product?"
     );
     if (confirmed) {
-      const deleted = await deleteProduct(id);
+      const deleted = await deleteProduct(id, token);
       if (deleted) {
         // get the latest products data from the API again so that it shows on frontend side
         const latestProducts = await getProducts(category, page);
@@ -111,6 +116,13 @@ export default function ProductGrid(props) {
                 width: "100%",
               }}
             >
+              {item.image ? (
+                <CardMedia
+                  sx={{ height: 140 }}
+                  component="img"
+                  image={`${API_URL}/${item.image}`}
+                />
+              ) : null}
               <CardContent
                 sx={{
                   height: "50%",
@@ -134,7 +146,7 @@ export default function ProductGrid(props) {
                 >
                   <Chip label={`$${item.price}`} color="success" />
                   <Chip
-                    label={item.category}
+                    label={item.category.name}  
                     sx={{ backgroundColor: redColor, color: "white" }}
                   />
                 </Stack>
@@ -147,21 +159,26 @@ export default function ProductGrid(props) {
                   height: "50%",
                 }}
               >
-                <Box
-                  sx={{
-                    width: "100%",
-                    backgroundColor: "white",
-                    fontWeight: "bold",
-                  }}
-                >
-                  <Button
-                    sx={{ width: "100%" }}
-                    variant="contained"
-                    onClick={() => addToCartHandler(item)}
-                  >
-                    Add to Cart
-                  </Button>
-                </Box>
+                {isUserLoggedin(cookie) ? (
+                  <>
+                    <Box
+                      sx={{
+                        width: "100%",
+                        backgroundColor: "white",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      <Button
+                        sx={{ width: "100%" }}
+                        variant="contained"
+                        onClick={() => addToCartHandler(item)}
+                      >
+                        Add to Cart
+                      </Button>
+                    </Box>
+                  </>
+                ) : null}
+
                 <Stack
                   direction="row"
                   spacing={1}

@@ -38,11 +38,19 @@ export const getCurrentUser = (cookie) => {
   return cookie.currentUser ? cookie.currentUser : null;
 };
 
+// checks if user is logged in or not
 export const isUserLoggedin = (cookie) => {
   return getCurrentUser(cookie) ? true : false;
 };
 
+// check if logged in user is an admin or not
 export const isAdmin = (cookie) => {
   const currentUser = getCurrentUser(cookie);
   return currentUser && currentUser.role === "admin" ? true : false;
+};
+
+// get the token of the current user
+export const getUserToken = (cookie) => {
+  const currentUser = getCurrentUser(cookie);
+  return currentUser && currentUser.token ? currentUser.token : "";
 };

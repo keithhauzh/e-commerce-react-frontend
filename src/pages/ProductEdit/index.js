@@ -12,6 +12,8 @@ import {
   TextField,
   Backdrop,
   CircularProgress,
+  Select,
+  MenuItem,
 } from "@mui/material";
 
 // react imports
@@ -25,8 +27,17 @@ import { useParams, useNavigate } from "react-router-dom";
 
 // API imports
 import { editProduct, getProduct } from "../../utils/api_products";
+import { getUserToken } from "../../utils/api_auth";
+import { getCategories } from "../../utils/api_categories";
+
+// import cookies for the token
+import { useCookies } from "react-cookie";
 
 export default function ProductEdit() {
+  // to get the current user as well as their token for authentication purposes
+  const [cookie] = useCookies(["currentUser"]);
+  const token = getUserToken(cookie);
+
   // calling useNavigate inside of a variable
   const navigate = useNavigate();
 
@@ -41,6 +52,15 @@ export default function ProductEdit() {
 
   // state for loader
   const [loading, setLoading] = useState(true);
+
+  // state for categories
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    getCategories().then((data) => {
+      setCategories(data);
+    });
+  }, [category]);
 
   useEffect(() => {
     getProduct(id).then((productData) => {
@@ -64,7 +84,8 @@ export default function ProductEdit() {
       name,
       description,
       price,
-      category
+      category,
+      token
     );
 
     if (updatedProduct) {
@@ -110,13 +131,18 @@ export default function ProductEdit() {
               />
             </Box>
             <Box mb={2}>
-              <TextField
+              <Select
                 label="Category"
-                required
-                fullWidth
                 value={category}
+                fullWidth
                 onChange={(event) => setCategory(event.target.value)}
-              />
+              >
+                {categories.map((category) => {
+                  return (
+                    <MenuItem value={category._id}>{category.name}</MenuItem>
+                  );
+                })}
+              </Select>
             </Box>
             <Button
               variant="contained"

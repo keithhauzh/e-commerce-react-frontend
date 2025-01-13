@@ -7,10 +7,15 @@ import { useCookies } from "react-cookie";
 // api imports
 import { isUserLoggedin } from "../../utils/api_auth";
 
+// clear cart function import
+import { clearCart } from "../../utils/api_cart";
+
 export default function Header(props) {
   const handleLogout = () => {
     // clear the cookies
     removeCookie("currentUser");
+    // clear the cart before logout
+    clearCart();
     // redirect the user back to login page
     navigate("/login");
   };
@@ -50,24 +55,30 @@ export default function Header(props) {
         >
           Home
         </Button>
-        <Button
-          variant={location.pathname === "/cart" ? "contained" : "outlined"}
-          onClick={() => {
-            navigate("/cart");
-          }}
-          sx={{ marginRight: "10px" }}
-        >
-          Cart
-        </Button>
-        <Button
-          variant={location.pathname === "/orders" ? "contained" : "outlined"}
-          onClick={() => {
-            navigate("/orders");
-          }}
-          sx={{ marginRight: "10px" }}
-        >
-          My Orders
-        </Button>
+        {isUserLoggedin(cookie) ? (
+          <>
+            <Button
+              variant={location.pathname === "/cart" ? "contained" : "outlined"}
+              onClick={() => {
+                navigate("/cart");
+              }}
+              sx={{ marginRight: "10px" }}
+            >
+              Cart
+            </Button>
+            <Button
+              variant={
+                location.pathname === "/orders" ? "contained" : "outlined"
+              }
+              onClick={() => {
+                navigate("/orders");
+              }}
+              sx={{ marginRight: "10px" }}
+            >
+              My Orders
+            </Button>
+          </>
+        ) : null}
 
         {/* login, signup, logout buttons */}
         {isUserLoggedin(cookie) ? (

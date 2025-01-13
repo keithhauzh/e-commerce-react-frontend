@@ -18,14 +18,17 @@ import { ArrowRight, ArrowLeft } from "@mui/icons-material";
 // api imports
 import { getProducts } from "../../utils/api_products";
 import { getCategories } from "../../utils/api_categories";
+import { isAdmin } from "../../utils/api_auth";
 
 export default function Product() {
-
   // states
   const [page, setPage] = useState(1);
   const [products, setProducts] = useState([]);
   const [category, setCategory] = useState("all");
   const [categories, setCategories] = useState([]);
+
+  // variable for the cookie
+  const [cookie] = useCookies(["currentUser"]);
 
   useEffect(() => {
     getProducts(category, page).then((data) => {
@@ -54,14 +57,16 @@ export default function Product() {
         >
           <Box sx={{ mb: 2, display: "flex", justifyContent: "space-between" }}>
             <Typography variant="h5">Products</Typography>
-            <Button
-              LinkComponent={Link}
-              to="/products/new"
-              variant="contained"
-              color="success"
-            >
-              Add New
-            </Button>
+            {isAdmin(cookie) ? (
+              <Button
+                LinkComponent={Link}
+                to="/products/new"
+                variant="contained"
+                color="success"
+              >
+                Add New
+              </Button>
+            ) : null}
           </Box>
           <Box>
             <FormControl sx={{ minWidth: 120 }}>
@@ -78,7 +83,9 @@ export default function Product() {
               >
                 <MenuItem value="all">All</MenuItem>;
                 {categories.map((category) => {
-                  return <MenuItem value={category}>{category}</MenuItem>;
+                  return (
+                    <MenuItem value={category._id}>{category.name}</MenuItem>
+                  );
                 })}
               </Select>
             </FormControl>

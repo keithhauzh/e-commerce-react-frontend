@@ -1,3 +1,4 @@
+// ALL USER BASED API
 // add product to cart
 export function AddToCart(product) {
   // get the current items in the cart

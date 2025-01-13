@@ -1,5 +1,5 @@
 // React imports
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 // react-router imports
 import { useNavigate } from "react-router-dom";
@@ -16,21 +16,58 @@ import {
   CardContent,
   Typography,
   TextField,
+  Select,
+  MenuItem,
 } from "@mui/material";
+
+// import cookies for the token
+import { useCookies } from "react-cookie";
 
 // component imports
 import Header from "../../components/Header";
+import ButtonUpload from "../../components/ButtonUpload";
 
 // API imports
 import { addNewProduct } from "../../utils/api_products";
+import { getUserToken, isAdmin } from "../../utils/api_auth";
+import { uploadImage } from "../../utils/api_image";
+import { getCategories } from "../../utils/api_categories";
+
+// import api route from constant
+import { API_URL } from "../../constants";
 
 export default function ProductAddNew() {
+  // to get the current user as well as their token for authentication purposes
+  const [cookie] = useCookies(["currentUser"]);
+  const token = getUserToken(cookie);
+
   const navigate = useNavigate();
+
   // states for input fields
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState(0);
   const [category, setCategory] = useState("");
+
+  // state for image
+  const [image, setImage] = useState("");
+
+  // state for categories
+  const [categories, setCategories] = useState([]);
+
+  // useEffect for rendering categories
+  useEffect(() => {
+    getCategories().then((data) => {
+      setCategories(data);
+    });
+  }, [category]);
+
+  // check if admin is logged in or not
+  useEffect(() => {
+    if (!isAdmin(cookie)) {
+      navigate("/login");
+    }
+  }, [cookie, navigate]);
 
   // button handler for the fields
   const handleFormSubmit = async (event) => {
@@ -45,7 +82,9 @@ export default function ProductAddNew() {
       name,
       description,
       price,
-      category
+      category,
+      image,
+      token
     );
 
     if (newProductData) {
@@ -54,6 +93,12 @@ export default function ProductAddNew() {
       // redirect to home page
       navigate("/");
     }
+  };
+
+  const handleImageUpload = async (files) => {
+    // trigger the upload API
+    const { image_url = "" } = await uploadImage(files[0]); //destructuring
+    setImage(image_url);
   };
 
   return (
@@ -92,14 +137,53 @@ export default function ProductAddNew() {
             />
           </Box>
           <Box mb={2}>
-            <TextField
+            <Select
               label="Category"
               required
               fullWidth
               value={category}
               onChange={(event) => setCategory(event.target.value)}
-            />
+            >
+              {categories.map((category) => {
+                return (
+                  <MenuItem value={category._id}>{category.name}</MenuItem>
+                );
+              })}
+            </Select>
+            <TextField />
           </Box>
+          <Box
+            mb={2}
+            sx={{ display: "flex", flexDirection: "column", rowGap: "10px" }}
+          >
+            <Box>
+              <ButtonUpload
+                onFileUpload={(files) => {
+                  if (files && files[0]) {
+                    console.log(files);
+                    handleImageUpload(files);
+                  }
+                }}
+              />
+            </Box>
+
+            {image !== "" ? (
+              <img
+                src={`${API_URL}/${image}`}
+                style={{
+                  width: "100%",
+                  maxWidth: "300px",
+                }}
+              />
+            ) : null}
+          </Box>
+          <button
+            onClick={() => {
+              setImage("");
+            }}
+          >
+            Remove
+          </button>
           <Button
             variant="contained"
             color="primary"

@@ -22,11 +22,15 @@ import { Button } from "@mui/material";
 // toast imports
 import { toast } from "sonner";
 
+// cookies import
+import { useCookies } from "react-cookie";
+
 // component imports
 import Header from "../../components/Header";
 
 // api imports
 import { getOrders, updateOrder, deleteOrder } from "../../utils/api_orders";
+import { getUserToken, isAdmin } from "../../utils/api_auth";
 
 // react imports
 import { useEffect, useState } from "react";
@@ -36,6 +40,10 @@ import * as React from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function Orders() {
+  // variable for the cookie
+  const [cookie] = useCookies(["currentUser"]);
+  const token = getUserToken(cookie);
+
   // calling useNavigate inside of a variable
   const navigate = useNavigate();
 
@@ -44,7 +52,7 @@ export default function Orders() {
 
   // then is needed because function needs to wait for the data to come back and only then set the state
   useEffect(() => {
-    getOrders().then((data) => {
+    getOrders(token).then((data) => {
       setOrders(data);
       console.log(orders);
     });
@@ -56,10 +64,10 @@ export default function Orders() {
     let value = event.target.value.toLowerCase();
 
     // trigger api
-    const updatedOrder = await updateOrder(orderId, value);
+    const updatedOrder = await updateOrder(orderId, value, token);
 
     if (updatedOrder) {
-      const latestOrders = await getOrders();
+      const latestOrders = await getOrders(token);
       setOrders(latestOrders);
       toast.success("Order status has been updated successfully");
       navigate("/orders");
@@ -73,10 +81,10 @@ export default function Orders() {
       "Are you sure you want to delete this product?"
     );
     if (confirmed) {
-      const deleted = await deleteOrder(id);
+      const deleted = await deleteOrder(id, token);
       if (deleted) {
         // get the latest products data from the API again so that it shows on frontend side
-        const latestOrders = await getOrders();
+        const latestOrders = await getOrders(token);
         setOrders(latestOrders);
         toast.success("Order deleted successfully");
       } else {
@@ -104,86 +112,113 @@ export default function Orders() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {orders.map((order) => (
-                <TableRow
-                  key={order._id}
-                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                >
-                  <TableCell component="th" scope="row">
-                    {order.customerName}
-                  </TableCell>
-                  <TableCell align="left">
-                    <Grid
-                      container
-                      rowSpacing={1}
-                      columnSpacing={{ xs: 1, sm: 2, md: 3 }}
-                      sx={{ flexDirection: "column" }}
+              {orders && orders.length > 0
+                ? orders.map((order) => (
+                    <TableRow
+                      key={order._id}
+                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                     >
-                      {order.products.map((product) => (
-                        <Grid key={product._id}>{product.name}</Grid>
-                      ))}
-                    </Grid>
-                  </TableCell>
-                  <TableCell align="right">{order.totalPrices}</TableCell>
-                  <TableCell align="left">
-                    <FormControl fullWidth>
-                      {order.status !== "pending" ? (
-                        <>
-                          <InputLabel id="demo-simple-select-label">
-                            Status
-                          </InputLabel>
-                          <Select
-                            labelId="demo-simple-select-label"
-                            id="demo-simple-select"
-                            value={order.status}
-                            label="Status"
-                            onChange={(event) =>
-                              onChangeHandler(event, order._id)
-                            }
-                          >
-                            <MenuItem value="failed">Failed</MenuItem>
-                            <MenuItem value="paid">Paid</MenuItem>
-                            {order.status === "paid" || "failed" ? (
-                              <MenuItem disabled value="pending">
-                                Pending
-                              </MenuItem>
-                            ) : (
-                              <MenuItem value="pending">Pending</MenuItem>
-                            )}
-                          </Select>
-                        </>
-                      ) : (
-                        <TextField
-                          id="outlined-basic"
-                          label="Pending"
-                          variant="outlined"
-                          disabled
+                      <TableCell component="th" scope="row">
+                        {order.customerName}
+                      </TableCell>
+                      <TableCell align="left">
+                        <Grid
+                          container
+                          rowSpacing={1}
+                          columnSpacing={{ xs: 1, sm: 2, md: 3 }}
+                          sx={{ flexDirection: "column" }}
                         >
-                          Pending
-                        </TextField>
-                      )}
-                    </FormControl>
-                  </TableCell>
-                  <TableCell align="right">
-                    {order.paid_at
-                      ? order.paid_at
-                      : "Owed RM" + order.totalPrices}
-                  </TableCell>
-                  {order.status === "pending" ? (
-                    <TableCell align="right">
-                      <Button
-                        onClick={() => {
-                          handleDelete(order._id);
-                        }}
-                        color="warning"
-                        variant="outlined"
-                      >
-                        Delete
-                      </Button>
-                    </TableCell>
-                  ) : null}
-                </TableRow>
-              ))}
+                          {order.products.map((product) => (
+                            <Grid key={product._id}>{product.name}</Grid>
+                          ))}
+                        </Grid>
+                      </TableCell>
+                      <TableCell align="right">{order.totalPrices}</TableCell>
+                      <TableCell align="left">
+                        <FormControl fullWidth>
+                          {order.status !== "pending" ? (
+                            <>
+                              <InputLabel id="demo-simple-select-label">
+                                Status
+                              </InputLabel>
+                              <Select
+                                labelId="demo-simple-select-label"
+                                id="demo-simple-select"
+                                value={order.status}
+                                label="Status"
+                                onChange={(event) =>
+                                  onChangeHandler(event, order._id)
+                                }
+                              >
+                                {isAdmin(cookie) ? (
+                                  order.status === "paid" || "failed" ? (
+                                    <MenuItem disabled value="pending">
+                                      Pending
+                                    </MenuItem>
+                                  ) : (
+                                    <MenuItem value="pending">Pending</MenuItem>
+                                  )
+                                ) : (
+                                  <>
+                                    <MenuItem value="failed">Failed</MenuItem>
+                                    <MenuItem value="paid">Paid</MenuItem>
+                                    {order.status === "paid" || "failed" ? (
+                                      <MenuItem disabled value="pending">
+                                        Pending
+                                      </MenuItem>
+                                    ) : (
+                                      <MenuItem value="pending">
+                                        Pending
+                                      </MenuItem>
+                                    )}
+                                  </>
+                                )}
+                                <MenuItem value="failed">Failed</MenuItem>
+                                <MenuItem value="paid">Paid</MenuItem>
+                                {order.status === "paid" || "failed" ? (
+                                  <MenuItem disabled value="pending">
+                                    Pending
+                                  </MenuItem>
+                                ) : (
+                                  <MenuItem value="pending">Pending</MenuItem>
+                                )}
+                              </Select>
+                            </>
+                          ) : (
+                            <TextField
+                              id="outlined-basic"
+                              label="Pending"
+                              variant="outlined"
+                              disabled
+                            >
+                              Pending
+                            </TextField>
+                          )}
+                        </FormControl>
+                      </TableCell>
+                      <TableCell align="right">
+                        {order.paid_at
+                          ? order.paid_at
+                          : "Owed RM" + order.totalPrices}
+                      </TableCell>
+                      {isAdmin(cookie) ? (
+                        order.status === "pending" ? (
+                          <TableCell align="right">
+                            <Button
+                              onClick={() => {
+                                handleDelete(order._id);
+                              }}
+                              color="warning"
+                              variant="outlined"
+                            >
+                              Delete
+                            </Button>
+                          </TableCell>
+                        ) : null
+                      ) : null}
+                    </TableRow>
+                  ))
+                : null}
             </TableBody>
           </Table>
         </TableContainer>

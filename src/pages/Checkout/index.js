@@ -1,6 +1,11 @@
 // API imports
 import { getCart, getTotalCartPrices } from "../../utils/api_cart";
 import { createOrder } from "../../utils/api_orders";
+import {
+  getUserToken,
+  getCurrentUser,
+  isUserLoggedin,
+} from "../../utils/api_auth";
 
 // sonner imports
 import { toast } from "sonner";
@@ -23,7 +28,13 @@ import {
 import Grid from "@mui/material/Grid2";
 
 // react imports
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+// react-router imports
+import { useNavigate } from "react-router-dom";
+
+// cookie import
+import { useCookies } from "react-cookie";
 
 // component imports
 import Header from "../../components/Header";
@@ -32,16 +43,34 @@ import Header from "../../components/Header";
 import { validateEmail } from "../../utils/email";
 
 export default function Checkout() {
+  const navigate = useNavigate();
+
   // state for loader
   const [loading, setLoading] = useState(false);
 
+  // variable for the cookie
+  const [cookie] = useCookies(["currentUser"]);
+  const token = getUserToken(cookie);
+  const currentUser = getCurrentUser(cookie);
+
   //   states for input fields
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [name, setName] = useState(
+    currentUser && currentUser.name ? currentUser.name : ""
+  );
+  const [email, setEmail] = useState(
+    currentUser && currentUser.email ? currentUser.email : ""
+  );
 
   // api functions' variable declarations to use in functions and handlers
   const cart = getCart();
   const totalPrices = getTotalCartPrices();
+
+  // check if user is logged in or not
+  useEffect(() => {
+    if (!isUserLoggedin(cookie)) {
+      navigate("/login");
+    }
+  }, [cookie, navigate]);
 
   // handler for the checkout button
   const doCheckout = async () => {
@@ -55,7 +84,7 @@ export default function Checkout() {
       // show loader
       setLoading(true);
       // 2. trigger the createOrder function
-      const response = await createOrder(name, email, cart, totalPrices);
+      const response = await createOrder(name, email, cart, totalPrices, token);
       // 3. get the billplz url
       const billplz_url = response.billplz_url;
       // 4. redirect the user to billplz payment page
@@ -97,7 +126,7 @@ export default function Checkout() {
                 label="Email"
                 fullWidth
                 value={email}
-                onChange={(event) => setEmail(event.target.value)}
+                disabled={true}
               />
             </Box>
 

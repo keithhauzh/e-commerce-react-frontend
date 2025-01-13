@@ -46,7 +46,13 @@ export default function PaymentVerify() {
       // redirect the user to /orders page
       navigate("/orders");
     });
-  }, []);
+  }, [
+    billplz_id,
+    billplz_paid,
+    billplz_paid_at,
+    billplz_x_signature,
+    navigate,
+  ]);
 
   return (
     <>
