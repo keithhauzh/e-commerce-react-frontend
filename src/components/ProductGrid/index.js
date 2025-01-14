@@ -28,8 +28,6 @@ import { toast } from "sonner";
 // API imports
 import { deleteProduct, getProducts } from "../../utils/api_products";
 import { isAdmin, isUserLoggedin, getUserToken } from "../../utils/api_auth";
-import {} from "../../utils/api_auth";
-import { uploadImage } from "../../utils/api_image";
 
 // constants import
 import { API_URL } from "../../constants";
@@ -114,18 +112,30 @@ export default function ProductGrid(props) {
                 display: "flex",
                 flexDirection: "column",
                 width: "100%",
+                height: "100%",
               }}
             >
               {item.image ? (
                 <CardMedia
-                  sx={{ height: 140 }}
+                  sx={{ objectFit: "cover", height: "70%" }}
                   component="img"
                   image={`${API_URL}/${item.image}`}
                 />
-              ) : null}
+              ) : (
+                <CardMedia
+                  sx={{
+                    height: "70%",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  No Image
+                </CardMedia>
+              )}
               <CardContent
                 sx={{
-                  height: "50%",
+                  height: "30%",
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "space-between",
@@ -146,7 +156,7 @@ export default function ProductGrid(props) {
                 >
                   <Chip label={`$${item.price}`} color="success" />
                   <Chip
-                    label={item.category.name}  
+                    label={item.category.name}
                     sx={{ backgroundColor: redColor, color: "white" }}
                   />
                 </Stack>
@@ -186,6 +196,7 @@ export default function ProductGrid(props) {
                     justifyContent: "space-between",
                     width: "100%",
                     mx: 1,
+                    my: 2,
                   }}
                 >
                   {isAdmin(cookie) ? (

@@ -17,6 +17,8 @@ import PaymentVerify from "./pages/PaymentVerify";
 import Orders from "./pages/Orders";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import Categories from "./pages/Categories";
+import CategoryEdit from "./pages/CategoryEdit";
 
 export default function App() {
   return (
@@ -34,6 +36,11 @@ export default function App() {
             <Route path="/orders" element={<Orders />}></Route>
             <Route path="/login" element={<Login />}></Route>
             <Route path="/signup" element={<Signup />}></Route>
+            <Route path="/categories" element={<Categories />}></Route>
+            <Route
+              path="/categories/:id/edit"
+              element={<CategoryEdit />}
+            ></Route>
           </Routes>
         </BrowserRouter>
         <Toaster richColors position="top-right" />

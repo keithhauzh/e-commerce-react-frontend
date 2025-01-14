@@ -6,7 +6,7 @@ import { toast } from "sonner";
 // constant API_URL import
 import { API_URL } from "../constants";
 
-// get products (public data)
+// get products (public data)c
 export const getProducts = async (category = "", page = 1) => {
   try {
     const response = await axios.get(

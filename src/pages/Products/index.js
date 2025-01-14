@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 // component imports
-import ProductGrid from "../../components/Card";
+import ProductGrid from "../../components/ProductGrid";
 import Header from "../../components/Header";
 
 // cookies import

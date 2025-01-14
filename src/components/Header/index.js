@@ -5,7 +5,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useCookies } from "react-cookie";
 
 // api imports
-import { isUserLoggedin } from "../../utils/api_auth";
+import { isUserLoggedin, isAdmin } from "../../utils/api_auth";
 
 // clear cart function import
 import { clearCart } from "../../utils/api_cart";
@@ -21,7 +21,7 @@ export default function Header(props) {
   };
 
   // cookies
-  const [cookie, setCookie, removeCookie] = useCookies(["currentUser"]);
+  const [cookie, removeCookie] = useCookies(["currentUser"]);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -109,11 +109,28 @@ export default function Header(props) {
               onClick={() => {
                 navigate("/signup");
               }}
+              sx={{ marginRight: "10px" }}
             >
               Signup
             </Button>
           </>
         )}
+
+        {/* category button */}
+        {isAdmin(cookie) ? (
+          <>
+            <Button
+              variant={
+                location.pathname === "/categories" ? "contained" : "outlined"
+              }
+              onClick={() => {
+                navigate("/categories");
+              }}
+            >
+              Categories
+            </Button>
+          </>
+        ) : null}
       </Box>
     </Box>
   );

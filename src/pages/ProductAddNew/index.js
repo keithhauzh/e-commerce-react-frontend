@@ -65,7 +65,7 @@ export default function ProductAddNew() {
   // check if admin is logged in or not
   useEffect(() => {
     if (!isAdmin(cookie)) {
-      navigate("/login");
+      navigate("/");
     }
   }, [cookie, navigate]);
 
