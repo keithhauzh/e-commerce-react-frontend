@@ -1,4 +1,4 @@
-import { Typography, Box, Button } from "@mui/material";
+import { Typography, Box, Button, Container } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
 
 // cookies library import
@@ -26,6 +26,7 @@ export default function Header(props) {
   const navigate = useNavigate();
   const location = useLocation();
   const { title = "Welcome To My Store" } = props;
+
   return (
     <Box
       sx={{
@@ -45,93 +46,121 @@ export default function Header(props) {
       >
         {title}
       </Typography>
-      <Box sx={{ display: "flex", justifyContent: "center" }} mt={2}>
-        <Button
-          variant={location.pathname === "/" ? "contained" : "outlined"}
-          onClick={() => {
-            navigate("/");
-          }}
-          sx={{ marginRight: "10px" }}
-        >
-          Home
-        </Button>
-        {isUserLoggedin(cookie) ? (
-          <>
-            <Button
-              variant={location.pathname === "/cart" ? "contained" : "outlined"}
-              onClick={() => {
-                navigate("/cart");
-              }}
-              sx={{ marginRight: "10px" }}
-            >
-              Cart
-            </Button>
-            <Button
-              variant={
-                location.pathname === "/orders" ? "contained" : "outlined"
-              }
-              onClick={() => {
-                navigate("/orders");
-              }}
-              sx={{ marginRight: "10px" }}
-            >
-              My Orders
-            </Button>
-          </>
-        ) : null}
 
-        {/* login, signup, logout buttons */}
-        {isUserLoggedin(cookie) ? (
+      <Container
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginTop: "15px",
+        }}
+        mt={2}
+      >
+        <Box>
           <Button
-            variant={location.pathname === "/login" ? "contained" : "outlined"}
-            onClick={handleLogout}
+            variant={location.pathname === "/" ? "contained" : "outlined"}
+            onClick={() => {
+              navigate("/");
+            }}
             sx={{ marginRight: "10px" }}
           >
-            Logout
+            Home
           </Button>
-        ) : (
-          <>
-            <Button
-              variant={
-                location.pathname === "/login" ? "contained" : "outlined"
-              }
-              onClick={() => {
-                navigate("/login");
-              }}
-              sx={{ marginRight: "10px" }}
-            >
-              Login
-            </Button>
-            <Button
-              variant={
-                location.pathname === "/signup" ? "contained" : "outlined"
-              }
-              onClick={() => {
-                navigate("/signup");
-              }}
-              sx={{ marginRight: "10px" }}
-            >
-              Signup
-            </Button>
-          </>
-        )}
+          {isUserLoggedin(cookie) ? (
+            <>
+              <Button
+                variant={
+                  location.pathname === "/cart" ? "contained" : "outlined"
+                }
+                onClick={() => {
+                  navigate("/cart");
+                }}
+                sx={{ marginRight: "10px" }}
+              >
+                Cart
+              </Button>
+              <Button
+                variant={
+                  location.pathname === "/orders" ? "contained" : "outlined"
+                }
+                onClick={() => {
+                  navigate("/orders");
+                }}
+                sx={{ marginRight: "10px" }}
+              >
+                My Orders
+              </Button>
+            </>
+          ) : null}
+          {/* category button */}
+          {isAdmin(cookie) ? (
+            <>
+              <Button
+                variant={
+                  location.pathname === "/categories" ? "contained" : "outlined"
+                }
+                onClick={() => {
+                  navigate("/categories");
+                }}
+                sx={{ marginRight: "10px" }}
+              >
+                Categories
+              </Button>
+            </>
+          ) : null}
+        </Box>
 
-        {/* category button */}
-        {isAdmin(cookie) ? (
-          <>
-            <Button
-              variant={
-                location.pathname === "/categories" ? "contained" : "outlined"
-              }
-              onClick={() => {
-                navigate("/categories");
-              }}
-            >
-              Categories
-            </Button>
-          </>
-        ) : null}
-      </Box>
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <Box
+            sx={{
+              marginRight: "10px",
+              display: "flex",
+            }}
+          >
+            {isUserLoggedin(cookie) ? (
+              <p>Current User: {cookie.currentUser.name}</p>
+            ) : null}
+          </Box>
+          <Box>
+            {/* login, signup, logout buttons */}
+            {isUserLoggedin(cookie) ? (
+              <Button
+                variant={
+                  location.pathname === "/login" ? "contained" : "outlined"
+                }
+                onClick={handleLogout}
+                sx={{ marginRight: "10px" }}
+              >
+                Logout
+              </Button>
+            ) : (
+              <>
+                <Button
+                  variant={
+                    location.pathname === "/login" ? "contained" : "outlined"
+                  }
+                  onClick={() => {
+                    navigate("/login");
+                  }}
+                  sx={{ marginRight: "10px" }}
+                >
+                  Login
+                </Button>
+                <Button
+                  variant={
+                    location.pathname === "/signup" ? "contained" : "outlined"
+                  }
+                  onClick={() => {
+                    navigate("/signup");
+                  }}
+                  sx={{ marginRight: "10px" }}
+                >
+                  Signup
+                </Button>
+              </>
+            )}
+          </Box>
+        </Box>
+      </Container>
     </Box>
   );
 }
