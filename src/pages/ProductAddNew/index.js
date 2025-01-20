@@ -150,7 +150,6 @@ export default function ProductAddNew() {
                 );
               })}
             </Select>
-            <TextField />
           </Box>
           <Box
             mb={2}
@@ -177,13 +176,16 @@ export default function ProductAddNew() {
               />
             ) : null}
           </Box>
-          <button
+          <Button
+            sx={{ marginBottom: "15px" }}
+            variant="contained"
+            color="warning"
             onClick={() => {
               setImage("");
             }}
           >
             Remove
-          </button>
+          </Button>
           <Button
             variant="contained"
             color="primary"

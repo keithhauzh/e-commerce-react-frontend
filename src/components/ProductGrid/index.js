@@ -45,8 +45,6 @@ export default function ProductGrid(props) {
   // Color for chip
   const redColor = red[700];
 
-  const cardHeight = 250;
-
   // delete item handler (HANDLER)
   const handleDelete = async (id) => {
     console.log(id);
@@ -108,7 +106,6 @@ export default function ProductGrid(props) {
             <Card
               variant="outlined"
               sx={{
-                height: cardHeight,
                 display: "flex",
                 flexDirection: "column",
                 width: "100%",
@@ -156,7 +153,7 @@ export default function ProductGrid(props) {
                 >
                   <Chip label={`$${item.price}`} color="success" />
                   <Chip
-                    label={item.category.name}
+                    label={item.category ? item.category.name : null}
                     sx={{ backgroundColor: redColor, color: "white" }}
                   />
                 </Stack>

@@ -82,11 +82,15 @@ export default function Product() {
                 }}
               >
                 <MenuItem value="all">All</MenuItem>;
-                {categories.map((category) => {
-                  return (
-                    <MenuItem value={category._id}>{category.name}</MenuItem>
-                  );
-                })}
+                {categories.length > 0
+                  ? categories.map((category) => {
+                      return (
+                        <MenuItem key={category._id} value={category._id}>
+                          {category.name}
+                        </MenuItem>
+                      );
+                    })
+                  : null}
               </Select>
             </FormControl>
           </Box>
