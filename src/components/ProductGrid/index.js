@@ -153,7 +153,7 @@ export default function ProductGrid(props) {
                 >
                   <Chip label={`$${item.price}`} color="success" />
                   <Chip
-                    label={item.category ? item.category.name : null}
+                    label={item.category ? item.category.name : "No Category"}
                     sx={{ backgroundColor: redColor, color: "white" }}
                   />
                 </Stack>
